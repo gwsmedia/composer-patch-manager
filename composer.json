@@ -5,7 +5,6 @@
 		}
 	},
 	"scripts": {
-        "post-update-cmd": "MyVendor\\MyClass::postUpdate",
         "post-package-update": "MyVendor\\MyClass::postPackageInstall"
     },
 	"require": {
