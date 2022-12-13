@@ -1,18 +1,7 @@
 {
-	"autoload": {
-		"psr-4": {
-			"MyVendor\\": "./"
-		}
-	},
-	"scripts": {
-        "post-package-update": "MyVendor\\MyClass::postPackageInstall"
-    },
 	"require": {
-		"symfony/console": "4.0.0"
-	},
-    "config": {
-        "preferred-install": {
-            "symfony/console": "source"
-        }
-    }
+		"composer/composer": "^2.4",
+		"psr/http-message": "^1.0",
+		"symfony/filesystem": "^5.4"
+	}
 }

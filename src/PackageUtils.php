@@ -15,4 +15,10 @@ class PackageUtils {
 
 		return $package->getName();
     }
+
+	public static function createTempDir($packageDir) {
+		while(is_dir($packageDir)) $packageDir .= "_";
+		mkdir($packageDir);
+		return $packageDir;
+	}
 }
