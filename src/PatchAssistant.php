@@ -23,23 +23,30 @@ class PatchAssistant {
 
 
 	public function generatePatches() {
+		$this->showWarnings();
 		foreach($this->packages as $package) $this->generatePatch($package);
 	}
 
 
-	private function getHackedPackages() {
-		$hacksJSONPath = getcwd() . '/composer-hacks.json';
+	private function showWarnings() {
+		if(in_array('exec', explode(',', ini_get('disable_functions')))) {
+			die("PatchAssistant: \e[31mPHP's exec() is disabled. This is necessary to use generate the patch using 'git diff'. Either enable the function or generate the patches on a local copy of the site on which you have control of php.ini.\e[0m");
+		}
+	}
 
-		if(!file_exists($hacksJSONPath)) {
-			echo "PatchAssistant: \e[31mcould not find 'composer-hacks.json'. Please check the README.\e[0m" . PHP_EOL;
-			die();
+
+	private function getHackedPackages() {
+		$patchesJSONPath = getcwd() . '/composer-patches.json';
+
+		if(!file_exists($patchesJSONPath)) {
+			die("PatchAssistant: \e[31mcould not find 'composer-patches.json'. Please check the README.\e[0m" . PHP_EOL);
 		}
 
-		$json = file_get_contents($hacksJSONPath);
+		$json = file_get_contents($patchesJSONPath);
 		$jsonData = json_decode($json, true);
 
 		if(empty($jsonData)) {
-			echo "PatchAssistant: \e[31m'composer-hacks.json' is not a valid JSON.\e[0m" . PHP_EOL;
+			die("PatchAssistant: \e[31m'composer-patches.json' is not a valid JSON.\e[0m" . PHP_EOL);
 		}
 
 		return isset($jsonData['packages']) && is_array($jsonData['packages']) ? $jsonData['packages'] : [];
