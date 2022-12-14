@@ -11,6 +11,7 @@ switch($command) {
 	case 'generate':
 		$pa = new PatchAssistant();
 		$pa->generatePatches();
+		$pa->clean();
 		break;
 	default:
 		die("cpm: \e[31mCommand not known: '$command'.\e[0m" .PHP_EOL);

@@ -24,6 +24,18 @@ class JSONHandler {
 		}
 	}
 
+	public function traverseForValue($keys) {
+		$subtree = $this->data;
+		foreach($keys as $key) {
+			if(isset($subtree[$key])) {
+				$subtree = $subtree[$key];
+			} else {
+				return false;
+			}
+		}
+		return $subtree;
+	}
+
 	public function save() {
 		file_put_contents($this->filepath, json_encode($this->data, JSON_PRETTY_PRINT));
 	}

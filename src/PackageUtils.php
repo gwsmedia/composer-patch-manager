@@ -16,9 +16,21 @@ class PackageUtils {
 		return $package->getName();
     }
 
-	public static function createTempDir($packageDir) {
-		while(is_dir($packageDir)) $packageDir .= "_";
-		mkdir($packageDir);
-		return $packageDir;
+	public static function createCpmDir() {
+		$dir = self::createSafeDir(getcwd().'/.cpm');
+		file_put_contents("$dir/composer.json", '{"require": {}}');
+		echo "PackageUtils: \e[36mCreated dir \e[33m$dir\e[0m".PHP_EOL;
+		return $dir;
+	}
+
+	public static function getSafeDirName($dir) {
+		while(is_dir($dir)) $dir .= "_";
+		return $dir;
+	}
+
+	public static function createSafeDir($dir) {
+		$safeDir = self::getSafeDirName($dir);
+		mkdir($safeDir);
+		return $safeDir;
 	}
 }
