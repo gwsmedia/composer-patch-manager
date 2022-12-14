@@ -2,7 +2,7 @@
 
 namespace ComposerPatchManager;
 
-require getcwd().'/vendor/autoload.php';
+require_once(getcwd().'/vendor/autoload.php');
 
 use Composer\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;

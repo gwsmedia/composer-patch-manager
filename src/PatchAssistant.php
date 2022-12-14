@@ -2,21 +2,26 @@
 
 namespace ComposerPatchManager;
 
-require(getcwd() . '/vendor/autoload.php');
-require(getcwd() . '/src/PackageUtils.php');
-require(getcwd() . '/src/ComposerProxy.php');
+require_once(__DIR__.'/PackageUtils.php');
+require_once(__DIR__.'/ComposerProxy.php');
+require_once(__DIR__.'/JSON/ConfigJSON.php');
+require_once(__DIR__.'/JSON/ComposerJSON.php');
 
 use ComposerPatchManager\PackageUtils;
 use ComposerPatchManager\ComposerProxy;
+use ComposerPatchManager\JSON\ConfigJSON;
+use ComposerPatchManager\JSON\ComposerJSON;
 use Symfony\Component\Filesystem\Filesystem;
 
 class PatchAssistant {
-	private $packages;
+	private $configJSON;
+	private $composerJSON;
 	private $composerProxy;
 	private $filesystem;
 
 	public function __construct() {
-		$this->packages = $this->getHackedPackages();
+		$this->configJSON = new ConfigJSON();
+		$this->composerJSON = new ComposerJSON();
 		$this->composerProxy = new ComposerProxy();
 		$this->filesystem = new Filesystem();
 	}
@@ -24,7 +29,7 @@ class PatchAssistant {
 
 	public function generatePatches() {
 		$this->showWarnings();
-		foreach($this->packages as $package) $this->generatePatch($package);
+		foreach($this->configJSON->getHackedPackages() as $package) $this->generatePatch($package);
 	}
 
 
@@ -32,24 +37,6 @@ class PatchAssistant {
 		if(in_array('exec', explode(',', ini_get('disable_functions')))) {
 			die("PatchAssistant: \e[31mPHP's exec() is disabled. This is necessary to use generate the patch using 'git diff'. Either enable the function or generate the patches on a local copy of the site on which you have control of php.ini.\e[0m");
 		}
-	}
-
-
-	private function getHackedPackages() {
-		$patchesJSONPath = getcwd() . '/composer-patches.json';
-
-		if(!file_exists($patchesJSONPath)) {
-			die("PatchAssistant: \e[31mcould not find 'composer-patches.json'. Please check the README.\e[0m" . PHP_EOL);
-		}
-
-		$json = file_get_contents($patchesJSONPath);
-		$jsonData = json_decode($json, true);
-
-		if(empty($jsonData)) {
-			die("PatchAssistant: \e[31m'composer-patches.json' is not a valid JSON.\e[0m" . PHP_EOL);
-		}
-
-		return isset($jsonData['packages']) && is_array($jsonData['packages']) ? $jsonData['packages'] : [];
 	}
 
 
