@@ -11,7 +11,7 @@ class ComposerLock extends JSONHandler {
 
 	public function getPackageVersion($targetPackage) {
 		foreach($this->data['packages'] as $package) {
-			if($package['name'] == $targetPackage) {
+			if(strtolower($package['name']) == strtolower($targetPackage)) {
 				return $package['version'];
 			}
 		}

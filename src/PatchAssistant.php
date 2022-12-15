@@ -34,7 +34,7 @@ class PatchAssistant {
 
 	public function generatePatches() {
 		$this->showWarnings();
-		foreach($this->configJSON->getHackedPackages() as $package) $this->generatePatch($package);
+		foreach($this->configJSON->getHackedPackages() as $package) $this->generatePatch(strtolower($package));
 	}
 
 
