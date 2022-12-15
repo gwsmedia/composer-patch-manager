@@ -4,7 +4,7 @@ namespace ComposerPatchManager;
 
 use Composer\Installer\PackageEvent;
 
-class PackageUtils {
+final class PackageUtils {
     public static function getPackageName(PackageEvent $event) {
 		/** @var InstallOperation|UpdateOperation $operation */
 		$operation = $event->getOperation();

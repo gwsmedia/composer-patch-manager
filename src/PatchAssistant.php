@@ -3,23 +3,21 @@
 namespace ComposerPatchManager;
 
 use ComposerPatchManager\PackageUtils;
-use ComposerPatchManager\ComposerProxy;
 use ComposerPatchManager\JSON\ConfigJSON;
-use ComposerPatchManager\JSON\ComposerJSON;
 use ComposerPatchManager\JSON\ComposerLock;
+use ComposerPatchManager\Proxy\GitProxy;
+use ComposerPatchManager\Proxy\ComposerProxy;
 use Symfony\Component\Filesystem\Filesystem;
 
 class PatchAssistant {
 	private $cpmDir;
 	private $configJSON;
-	private $composerJSON;
 	private $composerProxy;
 	private $filesystem;
 
 	public function __construct() {
 		$this->cpmDir = PackageUtils::createCpmDir();
 		$this->configJSON = new ConfigJSON();
-		$this->composerJSON = new ComposerJSON();
 		$this->composerLock = new ComposerLock();
 		$this->composerProxy = new ComposerProxy($this->cpmDir);
 		$this->filesystem = new Filesystem();
@@ -35,6 +33,18 @@ class PatchAssistant {
 	public function generatePatches() {
 		$this->showWarnings();
 		foreach($this->configJSON->getHackedPackages() as $package) $this->generatePatch(strtolower($package));
+	}
+
+
+	public function applyPatches() {
+		$patches = $this->configJSON->getPatches();
+		foreach($patches as $package) {
+			foreach($package as $patch) {
+				GitProxy::applyPatch($patch);
+			}
+		}
+
+		$this->showFailedPatches();
 	}
 
 
@@ -71,7 +81,7 @@ class PatchAssistant {
 
 		$patchPath = 'patch/' . str_replace('/', '--', $package) . '.patch';
 		if(!file_exists('patch')) mkdir('patch', 0777, true);
-		exec("git diff --no-index \"$sourcePkdDir\" \"$alteredPkgDir\" > \"$patchPath\"");
+		GitProxy::diff($sourcePkdDir, $alteredPkgDir, $patchPath);
 
 		$this->sanitisePatch($patchPath, $alteredPkgDir, $sourcePkdDir);
 
@@ -87,6 +97,7 @@ class PatchAssistant {
 	}
 
 
+	// Sanitising filepaths for patch
 	private function sanitisePatch($patchPath, $searchDir, $replaceDir) {
 		$searchDir = substr($searchDir, 1).'/';
 		$replaceDir = substr($replaceDir, 1).'/';
@@ -95,6 +106,12 @@ class PatchAssistant {
 		$patch = file_get_contents($patchPath);
 		$patch = str_replace($searchDir, $replaceDir, $patch);
 		$patch = str_replace($cpmDir, '', $patch);
+
 		file_put_contents($patchPath, $patch);
+	}
+
+	
+	private function showFailedPatches() {
+		echo "Not done yet".PHP_EOL;
 	}
 }

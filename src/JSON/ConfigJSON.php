@@ -4,10 +4,13 @@ namespace ComposerPatchManager\JSON;
 
 use ComposerPatchManager\JSON\JSONHandler;
 
+
 class ConfigJSON extends JSONHandler {
+	
 	public function __construct() {
 		parent::__construct(getcwd().'/composer-patches.json');
 	}
+
 
 	public function getHackedPackages() {
 		if(!isset($this->data['packages']) || !is_array($this->data['packages'])) {
@@ -15,6 +18,17 @@ class ConfigJSON extends JSONHandler {
 		}
 		
 		return $this->data['packages'];
+	}
+
+
+	public function getPatches() {
+		return $this->data['patches'];
+	}
+
+
+	public function getPatchesForPackage($package) {
+		$patches = $this->getPatches();
+		return isset($patches[$package]) ? $patches[$package] : [];
 	}
 
 }

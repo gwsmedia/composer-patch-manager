@@ -3,6 +3,7 @@
 require_once(__DIR__.'/../../autoload.php');
 
 use ComposerPatchManager\PatchAssistant;
+use ComposerPatchManager\Proxy\GitProxy;
 
 if(empty($argv[1])) return;
 $command = $argv[1];
@@ -11,6 +12,11 @@ switch($command) {
 	case 'generate':
 		$pa = new PatchAssistant();
 		$pa->generatePatches();
+		$pa->clean();
+		break;
+	case 'apply':
+		$pa = new PatchAssistant();
+		$pa->applyPatches();
 		$pa->clean();
 		break;
 	default:

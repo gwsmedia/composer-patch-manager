@@ -1,6 +1,6 @@
 <?php
 
-namespace ComposerPatchManager;
+namespace ComposerPatchManager\Proxy;
 
 use Composer\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
