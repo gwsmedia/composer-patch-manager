@@ -77,7 +77,7 @@ class PatchAssistant {
 
 		echo "PatchAssistant: \e[36mPatchfile created at \e[32m$patchPath\e[0m" . PHP_EOL;
 
-		$this->configJSON->data['patches'][$package][] = $patchPath;
+		$this->configJSON->data['patches'][$package][$patchPath] = $patchPath;
 		$this->configJSON->save();
 
 		echo "PatchAssistant: \e[33mcomposer-patches.json\e[36m updated\e[0m" . PHP_EOL;
