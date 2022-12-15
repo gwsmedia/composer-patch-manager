@@ -2,11 +2,6 @@
 
 namespace ComposerPatchManager;
 
-require_once(__DIR__.'/PackageUtils.php');
-require_once(__DIR__.'/ComposerProxy.php');
-require_once(__DIR__.'/JSON/ConfigJSON.php');
-require_once(__DIR__.'/JSON/ComposerJSON.php');
-
 use ComposerPatchManager\PackageUtils;
 use ComposerPatchManager\ComposerProxy;
 use ComposerPatchManager\JSON\ConfigJSON;
