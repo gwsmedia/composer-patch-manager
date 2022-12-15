@@ -6,6 +6,7 @@ use ComposerPatchManager\PackageUtils;
 use ComposerPatchManager\ComposerProxy;
 use ComposerPatchManager\JSON\ConfigJSON;
 use ComposerPatchManager\JSON\ComposerJSON;
+use ComposerPatchManager\JSON\ComposerLock;
 use Symfony\Component\Filesystem\Filesystem;
 
 class PatchAssistant {
@@ -19,6 +20,7 @@ class PatchAssistant {
 		$this->cpmDir = PackageUtils::createCpmDir();
 		$this->configJSON = new ConfigJSON();
 		$this->composerJSON = new ComposerJSON();
+		$this->composerLock = new ComposerLock();
 		$this->composerProxy = new ComposerProxy($this->cpmDir);
 		$this->filesystem = new Filesystem();
 	}
@@ -56,7 +58,7 @@ class PatchAssistant {
 		echo "PatchAssistant: \e[36mComparing package with unaltered source.\e[0m" . PHP_EOL;
 		echo "PatchAssistant: \e[36mDownloading fresh \e[32m$package\e[0m to \e[33m{$this->cpmDir}/vendor\e[0m" . PHP_EOL;
 
-		$pkgVersion = $this->composerJSON->traverseForValue(['require', $package]);
+		$pkgVersion = $this->composerLock->getPackageVersion($package);
 		$this->composerProxy->requirePackage("$package $pkgVersion");
 		$sourcePkdDir = $this->cpmDir."/vendor/$package";
 
@@ -69,7 +71,7 @@ class PatchAssistant {
 
 		$patchPath = 'patch/' . str_replace('/', '--', $package) . '.patch';
 		if(!file_exists('patch')) mkdir('patch', 0777, true);
-		exec("git diff --no-index --output \"$patchPath\" \"$sourcePkdDir\" \"$alteredPkgDir\"");
+		exec("git diff --no-index \"$sourcePkdDir\" \"$alteredPkgDir\" > \"$patchPath\"");
 
 		$this->sanitisePatch($patchPath, $alteredPkgDir, $sourcePkdDir);
 
