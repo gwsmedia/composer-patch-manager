@@ -39,13 +39,14 @@ class PatchAssistant {
 
 	public function applyPatches() {
 		$patches = $this->configJSON->getPatches();
-		foreach($patches as $package) {
-			foreach($package as $patch) {
+		foreach($patches as $package => $patches) {
+			foreach($patches as $patch) {
 				GitProxy::applyPatch($patch);
 			}
+
+			PackageUtils::showFailedHunks($package);
 		}
 
-		$this->showFailedPatches();
 	}
 
 
@@ -116,10 +117,5 @@ class PatchAssistant {
 		$patch = str_replace($cpmDir, '', $patch);
 
 		file_put_contents($patchPath, $patch);
-	}
-
-	
-	private function showFailedPatches() {
-		echo "Not done yet".PHP_EOL;
 	}
 }

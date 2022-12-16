@@ -19,6 +19,8 @@ class GitProxy {
 		exec("git diff --no-index \"$dir1\" \"$dir2\" > \"$outputFile\"");
 	}
 
+
+	// TODO: Split plugin
 	public static function applyPatch($patch, $heuristicLvl = self::HEURISTIC_NONE) {
 		if($heuristicLvl == self::HEURISTIC_NONE) echo PHP_EOL."GitProxy: \e[36mTesting patch $patch\e[0m".PHP_EOL; 
 

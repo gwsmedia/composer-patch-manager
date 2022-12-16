@@ -17,5 +17,7 @@ class Hooks {
 		foreach($patches as $patch) {
 			GitProxy::applyPatch($patch);
 		}
+
+		PackageUtils::showFailedHunks($package);
 	}
 }

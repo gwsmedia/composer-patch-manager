@@ -37,4 +37,37 @@ final class PackageUtils {
 	public static function makeWindowsPathUnix($path) {
 		return str_replace("\\", "/", $path);
 	}
+
+	public static function showFailedHunks($package) {
+		$hunks = self::findFailedHunks(getcwd().'/vendor/'.$package);
+		if(!empty($hunks)) {
+			echo "PatchAssistant: \e[31mFailed patch hunks for \e[32m$package\e[31m:\e[0m".PHP_EOL;
+
+			foreach($hunks as $hunk) {
+				echo "\t\e[31m$hunk\e[0m".PHP_EOL;
+			}
+		}
+	}
+
+	private static function findFailedHunks($folder, $rejFiles = []) {
+		if(!is_dir($folder)) return [];
+
+		$exclude = ['.', '..'];
+		$files = scandir($folder);
+
+		foreach($files as $file) {
+			$path = "$folder/$file";
+
+			if(in_array($file, $exclude))
+				continue;
+
+			else if(is_dir($path))
+				$rejFiles = self::findFailedHunks($path, $rejFiles);
+
+			else if(preg_match('/.rej$/', $file))
+				$rejFiles[] = $path;
+		}
+
+		return $rejFiles;
+	}
 }
