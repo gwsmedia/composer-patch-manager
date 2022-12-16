@@ -10,21 +10,32 @@ if(!empty($_composer_autoload_path)) {
 }
 
 use ComposerPatchManager\PatchAssistant;
+use ComposerPatchManager\JSON\ComposerJSON;
 
 if(empty($argv[1])) return;
 $command = $argv[1];
 
 switch($command) {
+	case 'init':
+		echo "cpm: \e[36mSetting up ComposerPatchManager\e[0m".PHP_EOL;
+		$json = new ComposerJSON();
+		$json->updatePostPackageScripts();
+		$json->save();
+		echo "cpm: \e[36mSetup complete!\e[0m".PHP_EOL;
+		break;
+
 	case 'generate':
 		$pa = new PatchAssistant();
 		$pa->generatePatches();
 		$pa->clean();
 		break;
+
 	case 'apply':
 		$pa = new PatchAssistant();
 		$pa->applyPatches();
 		$pa->clean();
 		break;
+
 	default:
 		die("cpm: \e[31mCommand not known: '$command'.\e[0m" .PHP_EOL);
 }

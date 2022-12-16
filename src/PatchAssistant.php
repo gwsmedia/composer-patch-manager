@@ -12,6 +12,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class PatchAssistant {
 	private $cpmDir;
 	private $configJSON;
+	private $composerLock;
 	private $composerProxy;
 	private $filesystem;
 
