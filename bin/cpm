@@ -1,7 +1,13 @@
 #!/usr/bin/env php
 <?php
 
-require_once(__DIR__.'/../../autoload.php');
+if(!empty($_composer_autoload_path)) {
+	require_once($_composer_autoload_path);
+} else if(file_exists(__DIR__.'/../../../autoload.php')) {
+	require_once(__DIR__.'/../../../autoload.php');
+} else if(file_exists(__DIR__ . '/../autoload.php')) {
+	require_once(__DIR__ . '/../autoload.php');
+}
 
 use ComposerPatchManager\PatchAssistant;
 
