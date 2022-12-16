@@ -4,6 +4,7 @@ namespace ComposerPatchManager;
 
 use ComposerPatchManager\PackageUtils;
 use ComposerPatchManager\JSON\ConfigJSON;
+use ComposerPatchManager\JSON\ComposerJSON;
 use ComposerPatchManager\JSON\ComposerLock;
 use ComposerPatchManager\Proxy\GitProxy;
 use ComposerPatchManager\Proxy\ComposerProxy;
@@ -12,6 +13,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class PatchAssistant {
 	private $cpmDir;
 	private $configJSON;
+	private $composerJSON;
 	private $composerLock;
 	private $composerProxy;
 	private $filesystem;
@@ -19,6 +21,7 @@ class PatchAssistant {
 	public function __construct() {
 		$this->cpmDir = PackageUtils::createCpmDir();
 		$this->configJSON = new ConfigJSON();
+		$this->composerJSON = new ComposerJSON();
 		$this->composerLock = new ComposerLock();
 		$this->composerProxy = new ComposerProxy($this->cpmDir);
 		$this->filesystem = new Filesystem();
@@ -57,10 +60,18 @@ class PatchAssistant {
 	}
 			
 
+	// TODO: split function
 	private function generatePatch($package) {
 		echo "PatchAssistant: \e[36mProcessing package \e[32m$package\e[0m" . PHP_EOL;
 
-		$packageDir = getcwd() . '/vendor/' . $package;
+		$type = $this->composerLock->getPackageType($package);
+		$installerPath = $this->composerJSON->getInstallerPath($package, $type);
+
+		if($installerPath === false) {
+			$packageDir = getcwd() . '/vendor/' . $package;
+		} else {
+			$packageDir = getcwd() . '/' . $installerPath;
+		}
 
 		if(!file_exists($packageDir)) {
 			echo "PatchAssistant: \e[31mcould not find $packageDir\e[0m".PHP_EOL;

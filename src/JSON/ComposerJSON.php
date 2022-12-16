@@ -11,6 +11,25 @@ class ComposerJSON extends JSONHandler {
 		parent::__construct(getcwd().'/composer.json');
 	}
 
+	public function getInstallerPath($package, $type) {
+		if(empty($this->data['extra']['installer-paths'])) {
+			return false;
+		}
+
+		$typeString = "type:$type";
+		$paths = $this->data['extra']['installer-paths'];
+
+		foreach($paths as $path => $mappings) {
+			if(is_string($mappings)) $mappings = [$mappings];
+			if(in_array($typeString, $mappings)) {
+				$name = explode('/', $package)[1];
+				return str_replace('{$name}', $name, $path);
+			}
+		}
+
+		return false;
+	}
+
 	public function updatePostPackageScripts() {
 		$this->updatePostPackageScript('install');
 		$this->updatePostPackageScript('update');
