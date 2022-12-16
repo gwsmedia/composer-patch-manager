@@ -33,4 +33,8 @@ final class PackageUtils {
 		mkdir($safeDir);
 		return $safeDir;
 	}
+
+	public static function makeWindowsPathUnix($path) {
+		return str_replace("\\", "/", $path);
+	}
 }

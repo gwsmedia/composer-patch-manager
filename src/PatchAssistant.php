@@ -99,12 +99,19 @@ class PatchAssistant {
 
 	// Sanitising filepaths for patch
 	private function sanitisePatch($patchPath, $searchDir, $replaceDir) {
-		$searchDir = substr($searchDir, 1).'/';
-		$replaceDir = substr($replaceDir, 1).'/';
-		$cpmDir = substr($this->cpmDir, 1).'/';
-
 		$patch = file_get_contents($patchPath);
+		$searchDir = PackageUtils::makeWindowsPathUnix($searchDir);
+		$replaceDir = PackageUtils::makeWindowsPathUnix($replaceDir);
+
+		// Replacing Windows paths with Unix paths
+		$windowsCwd = str_replace("\\", "\\\\", getcwd());
+		$unixCwd = PackageUtils::makeWindowsPathUnix(getcwd());
+		$patch = str_replace($windowsCwd, $unixCwd, $patch);
+
 		$patch = str_replace($searchDir, $replaceDir, $patch);
+
+		$cpmDir = PackageUtils::makeWindowsPathUnix($this->cpmDir);
+		if(strpos($cpmDir, '/') !== 0) $cpmDir = "/$cpmDir";
 		$patch = str_replace($cpmDir, '', $patch);
 
 		file_put_contents($patchPath, $patch);
