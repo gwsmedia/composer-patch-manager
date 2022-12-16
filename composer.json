@@ -2,17 +2,12 @@
 	"name": "gwsmedia/composer-patch-manager",
 	"require": {
 		"composer/composer": "^2.4",
-		"symfony/filesystem": "^5.4",
-		"cweagans/composer-patches": "^1.7"
+		"symfony/filesystem": "^5.4"
 	},
     "autoload": {
         "psr-4": {
             "ComposerPatchManager\\": "src/"
         }
     },
-	"config": {
-		"allow-plugins": {
-			"cweagans/composer-patches": true
-		}
-	}
+	"bin": ["bin/cpm"]
 }

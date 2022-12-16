@@ -1,9 +1,9 @@
+#!/usr/bin/env php
 <?php
 
 require_once(__DIR__.'/../../autoload.php');
 
 use ComposerPatchManager\PatchAssistant;
-use ComposerPatchManager\Proxy\GitProxy;
 
 if(empty($argv[1])) return;
 $command = $argv[1];
