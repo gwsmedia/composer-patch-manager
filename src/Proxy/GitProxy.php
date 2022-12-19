@@ -21,10 +21,10 @@ class GitProxy {
 
 
 	// TODO: Split plugin
-	public static function applyPatch($patch, $heuristicLvl = self::HEURISTIC_NONE) {
+	public static function applyPatch($patch, $heuristicLvl = self::HEURISTIC_NONE, $heuristicsDone = false) {
 		if($heuristicLvl == self::HEURISTIC_NONE) echo PHP_EOL."GitProxy: \e[36mTesting patch $patch\e[0m".PHP_EOL; 
 
-		if($heuristicLvl == self::HEURISTIC_COMPLETE) {
+		if($heuristicsDone) {
 			$checkParam = '-vvv ';
 			echo "GitProxy: \e[36mHeuristics complete\e[0m".PHP_EOL;
 			echo "GitProxy: \e[36mApplying patch\e[0m".PHP_EOL;
@@ -40,6 +40,18 @@ class GitProxy {
 
 		$log = trim(file_get_contents('patch.log'));
 
+		if($heuristicsDone) {
+			self::showCommandOutput($log);
+			// TODO: move patch log to cpmDir
+			unlink('patch.log');
+			if(preg_match('/^error: patch failed/m', $log)) {
+				echo "GitProxy: \e[41m\e[30mNot all hunks applied successfully.\e[49m\e[36m Check .rej files at the end.\e[0m".PHP_EOL;
+			} else {
+				echo "GitProxy: \e[42m\e[37mPatch applied successfully!\e[0m".PHP_EOL;
+			}
+			return;
+		}
+
 		switch($heuristicLvl) {
 			case self::HEURISTIC_NONE:
 			case self::HEURISTIC_RECOUNT:
@@ -49,7 +61,7 @@ class GitProxy {
 					self::applyPatch($patch, $heuristicLvl + 1);
 				} else {
 					echo "GitProxy: \e[32mPatch should apply successfully\e[0m".PHP_EOL;
-					self::applyPatch($patch, self::HEURISTIC_COMPLETE, true);
+					self::applyPatch($patch, $heuristicLvl, true);
 				}
 				break;
 
@@ -62,17 +74,7 @@ class GitProxy {
 				if(empty($answer) || $answer[0] != 'y') {
 					echo "GitProxy: \e[36mSkipping patch.\e[0m".PHP_EOL;
 				} else {
-					self::applyPatch($patch, self::HEURISTIC_COMPLETE, true);
-				}
-				break;
-
-			case self::HEURISTIC_COMPLETE:
-				self::showCommandOutput($log);
-				//			unlink('patch.log');
-				if(preg_match('/^error: patch failed/m', $log)) {
-					echo "GitProxy: \e[41m\e[30mNot all hunks applied successfully.\e[49m\e[36m Check .rej files at the end.\e[0m".PHP_EOL;
-				} else {
-					echo "GitProxy: \e[42m\e[37mPatch applied successfully!\e[0m".PHP_EOL;
+					self::applyPatch($patch, $heuristicLvl, true);
 				}
 				break;
 		}

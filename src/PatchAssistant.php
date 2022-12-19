@@ -6,7 +6,6 @@ use ComposerPatchManager\PackageUtils;
 use ComposerPatchManager\JSON\ConfigJSON;
 use ComposerPatchManager\JSON\ComposerJSON;
 use ComposerPatchManager\JSON\ComposerLock;
-use ComposerPatchManager\JSON\JSONHandler;
 use ComposerPatchManager\Proxy\GitProxy;
 use ComposerPatchManager\Proxy\ComposerProxy;
 use Symfony\Component\Filesystem\Filesystem;
@@ -25,10 +24,8 @@ class PatchAssistant {
 		$this->composerJSON = new ComposerJSON();
 		$this->composerLock = new ComposerLock();
 
-		$repos = $this->composerJSON->getRepositories(true);
-		$stability = $this->composerJSON->getMinStability();
-		$this->cpmDir = PackageUtils::createCpmDir($repos, $stability);
-		$this->cpmJSON = new JSONHandler($this->cpmDir.'/composer.json');
+		$this->cpmDir = PackageUtils::createCpmDir($this->composerJSON);
+		$this->cpmJSON = new composerJSON($this->cpmDir);
 
 		$this->composerProxy = new ComposerProxy($this->cpmDir);
 		$this->filesystem = new Filesystem();
@@ -83,17 +80,23 @@ class PatchAssistant {
 		echo "PatchAssistant: \e[36mComparing package with unaltered source.\e[0m" . PHP_EOL;
 		echo "PatchAssistant: \e[36mDownloading fresh \e[32m$package\e[0m to \e[33m{$this->cpmDir}/vendor\e[0m" . PHP_EOL;
 
+		// Reset cpmDir composer.json
+		$this->cpmJSON->reset();
+		// Mirror dir structure if necessary (so that the patch will also have the same structure)
+		if(!empty($installerPath)) $this->cpmJSON->setInstallerPath($installerPath, $package);
 		// Ignore package dependencies
-		$this->cpmJSON->data['replace'] = $this->composerLock->getPackageDependencies($package);
+		$this->cpmJSON->setPackageOverrides($this->composerLock->getPackageDependencies($package));
+		// Save changes
 		$this->cpmJSON->save();
 
+		// TODO: Convert to OOP
 		file_put_contents($this->cpmDir.'/composer.lock', $this->composerLock->getFilteredJSON($package));
 
 		$pkgVersion = $this->composerLock->getPackageVersion($package);
 		$this->composerProxy->requirePackage("$package $pkgVersion");
 		$sourcePkdDir = $this->cpmDir . '/' . PackageUtils::getPackagePath($package, $installerPath, true);
 
-		echo "PatchAssistant: \e[36mCoping altered \e[32m$package\e[0m to \e[33m{$this->cpmDir}/vendor\e[0m" . PHP_EOL;
+		echo "PatchAssistant: \e[36mCopying altered \e[32m$package\e[0m to \e[33m{$this->cpmDir}/vendor\e[0m" . PHP_EOL;
 
 		$alteredPkgDir = PackageUtils::createSafeDir($sourcePkdDir);
 		$this->filesystem->mirror($packageDir, $alteredPkgDir);

@@ -5,8 +5,9 @@ namespace ComposerPatchManager\JSON;
 use ComposerPatchManager\JSON\JSONHandler;
 
 class ComposerLock extends JSONHandler {
-	public function __construct() {
-		parent::__construct(getcwd().'/composer.lock');
+	public function __construct($dir = null) {
+		if(empty($dir)) $dir = getcwd();
+		parent::__construct($dir, 'composer.lock');
 	}
 
 	public function getPackageData($package) {

@@ -37,7 +37,7 @@ class ComposerProxy {
 	private function executeCommand($command, $package = null) {
 		chdir($this->cpmDir);
 				
-		$opts = array('command' => $command);
+		$opts = array('command' => $command, '-n');
 
 		if(!empty($package)) $opts['packages'] = [$package];
 

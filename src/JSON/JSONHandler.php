@@ -4,17 +4,25 @@ namespace ComposerPatchManager\JSON;
 
 class JSONHandler {
 	private $className;
+	public $dir;
+	public $filename;
 	public $filepath;
 	public $data;
 
-	public function __construct($filepath) {
-		$this->filepath = $filepath;
+	public function __construct($dir, $filename) {
+		$this->dir = $dir;
+		$this->filename = $filename;
+		$this->filepath = "$dir/$filename";
 		$this->className = (new \ReflectionClass($this))->getShortName();
 
 		if(!file_exists($this->filepath)) {
 			die("{$this->className}: \e[31mcould not find '{$this->filepath}'. Please check the README.\e[0m" . PHP_EOL);
 		}
 
+		$this->refresh();
+	}
+
+	public function refresh() {
 		$json = file_get_contents($this->filepath);
 		$this->data = json_decode($json, true);
 

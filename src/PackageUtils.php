@@ -3,6 +3,7 @@
 namespace ComposerPatchManager;
 
 use Composer\Installer\PackageEvent;
+use ComposerPatchManager\JSON\ComposerJSON;
 
 final class PackageUtils {
     public static function getPackageName(PackageEvent $event) {
@@ -27,9 +28,12 @@ final class PackageUtils {
 	}
 
 
-	public static function createCpmDir($repos, $stability) {
+	// TODO: move to dedicated cpmDir class
+	public static function createCpmDir($composerJSON) {
 		$dir = self::createSafeDir(getcwd().'/.cpm');
-		file_put_contents("$dir/composer.json", '{"require": {}, "repositories": '.$repos.', "minimum-stability": "'.$stability.'"}');
+		$repos = $composerJSON->getRepositories(true);
+		$stability = $composerJSON->getMinStability();
+		ComposerJSON::create($dir, '{}', $repos, $stability, false);
 		echo "PackageUtils: \e[36mCreated dir \e[33m$dir\e[0m".PHP_EOL;
 		return $dir;
 	}

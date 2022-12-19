@@ -7,8 +7,9 @@ use ComposerPatchManager\JSON\JSONHandler;
 
 class ConfigJSON extends JSONHandler {
 	
-	public function __construct() {
-		parent::__construct(getcwd().'/composer-patches.json');
+	public function __construct($dir = null) {
+		if(empty($dir)) $dir = getcwd();
+		parent::__construct($dir, 'composer-patches.json');
 	}
 
 
