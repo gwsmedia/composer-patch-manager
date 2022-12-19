@@ -36,7 +36,11 @@ class JSONHandler {
 		return $subtree;
 	}
 
+	public function getJSON() {
+		return json_encode($this->data, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
+	}
+
 	public function save() {
-		file_put_contents($this->filepath, json_encode($this->data, JSON_PRETTY_PRINT));
+		file_put_contents($this->filepath, $this->getJSON());
 	}
 }

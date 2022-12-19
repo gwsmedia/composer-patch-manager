@@ -12,7 +12,7 @@ class ComposerLock extends JSONHandler {
 	public function getPackageData($package) {
 		foreach($this->data['packages'] as $lockPackage) {
 			if(strtolower($lockPackage['name']) == strtolower($package)) {
-				return $package;
+				return $lockPackage;
 			}
 		}
 	}
@@ -28,5 +28,15 @@ class ComposerLock extends JSONHandler {
 
 	public function getPackageType($package) {
 		return $this->getPackageValue($package, 'type');
+	}
+
+	public function getPackageDependencies($package) {
+		return $this->getPackageValue($package, 'require');
+	}
+
+	public function getFilteredJSON($package) {
+		$data = $this->data;
+		$data['packages'] = [$this->getPackageData($package)];
+		return json_encode($data);
 	}
 }

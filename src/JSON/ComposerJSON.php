@@ -11,6 +11,18 @@ class ComposerJSON extends JSONHandler {
 		parent::__construct(getcwd().'/composer.json');
 	}
 
+	public function getRepositories($encode = false) {
+		if(isset($this->data['repositories'])) {
+			return $encode ? json_encode($this->data['repositories']) : $this->data['repositories'];
+		}
+
+		return $encode ? '[]' : [];
+	}
+
+	public function getMinStability() {
+		return isset($this->data['minimum-stability']) ? $this->data['minimum-stability'] : 'stable';
+	}
+
 	public function getInstallerPath($package, $type) {
 		if(empty($this->data['extra']['installer-paths'])) {
 			return false;

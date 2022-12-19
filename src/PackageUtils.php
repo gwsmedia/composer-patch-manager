@@ -16,9 +16,20 @@ final class PackageUtils {
 		return $package->getName();
     }
 
-	public static function createCpmDir() {
+
+	public static function getPackagePath($package, $installerPath = false, $relative = false) {
+		$prefix = $relative ? '' : getcwd().'/';
+		if($installerPath === false) {
+			return $prefix . 'vendor/' . $package;
+		} else {
+			return $prefix . $installerPath;
+		}
+	}
+
+
+	public static function createCpmDir($repos, $stability) {
 		$dir = self::createSafeDir(getcwd().'/.cpm');
-		file_put_contents("$dir/composer.json", '{"require": {}}');
+		file_put_contents("$dir/composer.json", '{"require": {}, "repositories": '.$repos.', "minimum-stability": "'.$stability.'"}');
 		echo "PackageUtils: \e[36mCreated dir \e[33m$dir\e[0m".PHP_EOL;
 		return $dir;
 	}
@@ -29,8 +40,16 @@ final class PackageUtils {
 	}
 
 	public static function createSafeDir($dir) {
+		$cwd = getcwd();
 		$safeDir = self::getSafeDirName($dir);
-		mkdir($safeDir);
+		$pathArray = explode('/', $safeDir);
+
+		foreach($pathArray as $pathSegment) {
+			if(!is_dir($pathSegment)) mkdir($pathSegment);
+			chdir($pathSegment);
+		}
+
+		chdir($cwd);
 		return $safeDir;
 	}
 

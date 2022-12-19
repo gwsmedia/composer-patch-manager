@@ -6,12 +6,14 @@ use ComposerPatchManager\PackageUtils;
 use ComposerPatchManager\JSON\ConfigJSON;
 use ComposerPatchManager\JSON\ComposerJSON;
 use ComposerPatchManager\JSON\ComposerLock;
+use ComposerPatchManager\JSON\JSONHandler;
 use ComposerPatchManager\Proxy\GitProxy;
 use ComposerPatchManager\Proxy\ComposerProxy;
 use Symfony\Component\Filesystem\Filesystem;
 
 class PatchAssistant {
 	private $cpmDir;
+	private $cpmJSON;
 	private $configJSON;
 	private $composerJSON;
 	private $composerLock;
@@ -19,10 +21,15 @@ class PatchAssistant {
 	private $filesystem;
 
 	public function __construct() {
-		$this->cpmDir = PackageUtils::createCpmDir();
 		$this->configJSON = new ConfigJSON();
 		$this->composerJSON = new ComposerJSON();
 		$this->composerLock = new ComposerLock();
+
+		$repos = $this->composerJSON->getRepositories(true);
+		$stability = $this->composerJSON->getMinStability();
+		$this->cpmDir = PackageUtils::createCpmDir($repos, $stability);
+		$this->cpmJSON = new JSONHandler($this->cpmDir.'/composer.json');
+
 		$this->composerProxy = new ComposerProxy($this->cpmDir);
 		$this->filesystem = new Filesystem();
 	}
@@ -66,12 +73,7 @@ class PatchAssistant {
 
 		$type = $this->composerLock->getPackageType($package);
 		$installerPath = $this->composerJSON->getInstallerPath($package, $type);
-
-		if($installerPath === false) {
-			$packageDir = getcwd() . '/vendor/' . $package;
-		} else {
-			$packageDir = getcwd() . '/' . $installerPath;
-		}
+		$packageDir = PackageUtils::getPackagePath($package, $installerPath);
 
 		if(!file_exists($packageDir)) {
 			echo "PatchAssistant: \e[31mcould not find $packageDir\e[0m".PHP_EOL;
@@ -81,9 +83,15 @@ class PatchAssistant {
 		echo "PatchAssistant: \e[36mComparing package with unaltered source.\e[0m" . PHP_EOL;
 		echo "PatchAssistant: \e[36mDownloading fresh \e[32m$package\e[0m to \e[33m{$this->cpmDir}/vendor\e[0m" . PHP_EOL;
 
+		// Ignore package dependencies
+		$this->cpmJSON->data['replace'] = $this->composerLock->getPackageDependencies($package);
+		$this->cpmJSON->save();
+
+		file_put_contents($this->cpmDir.'/composer.lock', $this->composerLock->getFilteredJSON($package));
+
 		$pkgVersion = $this->composerLock->getPackageVersion($package);
 		$this->composerProxy->requirePackage("$package $pkgVersion");
-		$sourcePkdDir = $this->cpmDir."/vendor/$package";
+		$sourcePkdDir = $this->cpmDir . '/' . PackageUtils::getPackagePath($package, $installerPath, true);
 
 		echo "PatchAssistant: \e[36mCoping altered \e[32m$package\e[0m to \e[33m{$this->cpmDir}/vendor\e[0m" . PHP_EOL;
 
