@@ -46,7 +46,7 @@ final class PackageUtils {
 	public static function createSafeDir($dir) {
 		$cwd = getcwd();
 		$safeDir = self::getSafeDirName($dir);
-		$pathArray = explode('/', $safeDir);
+		$pathArray = array_filter(explode('/', str_replace(getcwd(), '', $safeDir)));
 
 		foreach($pathArray as $pathSegment) {
 			if(!is_dir($pathSegment)) mkdir($pathSegment);
