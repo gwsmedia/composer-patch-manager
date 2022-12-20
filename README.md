@@ -66,11 +66,11 @@ CPM uses the following heuristic methodology for applying patches (using `git di
 2. Then, attempt with `--recount` (ignoring line numbers)
 3. Then, attempt with `-C1` (only using 1 line of context either side)
 4. Finally, if still failing, attempt with `--reject` which will apply any hunks in a patch it can, and failed hunks will be stored in `.rej` files.
-   - CPM will run a **dry run** of this command and ask the user if they would like to proceed before making the changes.
-   - It will then show the user a list of all the rejected hunks.
-   - **Please note:** if you proceed with this method, not all of the changes in the patch file will be applied, so make sure no code within the patch relies on the rejected hunks. If so, it is best to do this *locally*, apply the rejected hunks manually, test, and then upload.
+    - CPM will run a **dry run** of this command and ask the user if they would like to proceed before making the changes.
+    - It will then show the user a list of all the rejected hunks.
+    - **Please note:** if you proceed with this method, not all of the changes in the patch file will be applied, so make sure no code within the patch relies on the rejected hunks. If so, it is best to do this *locally*, apply the rejected hunks manually, test, and then upload.
 
-## Example `composer-patches.json`
+## Example composer-patches.json
 ```
 {
 	"packages": ["psr/container", "drupal/quiz"],
