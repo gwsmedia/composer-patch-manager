@@ -91,3 +91,4 @@ CPM uses the following heuristic methodology for applying patches (using `git di
 ## Known issues
 - At the moment, you must only run `/vendor/bin/cpm` commands in the root project directory (where composer.json and composer.lock are defined)
 - `repositories` defined in composer.json that use `type: path` and a relative path will break the `generate` command
+- All patches must be relative to the project root - this is not ideal for patches downloaded from drupal.org for example which will be relative to the package folder, but this can be worked around by applying the patch manually, and then running the `generate` command to include it in the collective patch file.
