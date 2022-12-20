@@ -22,7 +22,7 @@ class GitProxy {
 
 	// TODO: Split plugin
 	public static function applyPatch($patch, $heuristicLvl = self::HEURISTIC_NONE, $heuristicsDone = false) {
-		if($heuristicLvl == self::HEURISTIC_NONE) echo PHP_EOL."GitProxy: \e[36mTesting patch $patch\e[0m".PHP_EOL; 
+		if($heuristicLvl == self::HEURISTIC_NONE) echo PHP_EOL."GitProxy: \e[36mTesting patch $patch\e[0m".PHP_EOL;
 
 		if($heuristicsDone) {
 			$checkParam = '-vvv ';
@@ -44,7 +44,7 @@ class GitProxy {
 			self::showCommandOutput($log);
 			// TODO: move patch log to cpmDir
 			unlink('patch.log');
-			if(preg_match('/^error: patch failed/m', $log)) {
+			if(preg_match('/^error:/m', $log)) {
 				echo "GitProxy: \e[41m\e[30mNot all hunks applied successfully.\e[49m\e[36m Check .rej files at the end.\e[0m".PHP_EOL;
 			} else {
 				echo "GitProxy: \e[42m\e[37mPatch applied successfully!\e[0m".PHP_EOL;
@@ -56,7 +56,7 @@ class GitProxy {
 			case self::HEURISTIC_NONE:
 			case self::HEURISTIC_RECOUNT:
 			case self::HEURISTIC_C1:
-				if(preg_match('/^error: .+ patch does not apply$/m', $log)) {
+				if(preg_match('/^error:/m', $log)) {
 					echo "GitProxy: \e[31mPatch does not apply, \e[33mincreasing heuristic level\e[0m".PHP_EOL;
 					self::applyPatch($patch, $heuristicLvl + 1);
 				} else {
