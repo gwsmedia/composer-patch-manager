@@ -1,5 +1,6 @@
 {
 	"name": "gwsmedia/composer-patch-manager",
+	"description": "composer-patches improved! A plugin for applying composer patches heuristically.",
 	"require": {
 		"composer/composer": "*",
 		"symfony/filesystem": "*"
